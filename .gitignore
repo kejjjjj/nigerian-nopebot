@@ -1,0 +1,14 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+package-lock.json
+package.json
+
+
+# Databases
+*.sqlite
+
+
+
+# Environment variables
+.env
