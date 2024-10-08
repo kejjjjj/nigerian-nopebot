@@ -1,6 +1,9 @@
 
 import { Client, GatewayIntentBits, EmbedBuilder, ThreadChannel } from "discord.js";
 import { GetWebhookByName, CreateWebhook } from './utils.js';
+import { Discord } from '../_db/discord.js';
+
+import { DC_OnMessageCreate } from './commands/main.js';
 
 import dotenv from 'dotenv'; dotenv.config();
 
@@ -29,12 +32,17 @@ export async function DC_StartBot() {
         console.log("Ready!");
     });
 
+    client.on("messageCreate", async (message) => {
+        await DC_OnMessageCreate(client, message);
+    }); 
 
     try {
+
+        await Discord.Init(); //register the database
         await client.login(process.env.DISCORD_BOT_TOKEN);
+
         console.log('Bot logged in successfully.');
 
-        
         if(!await GetWebhookByName("Enemy")){
             await CreateWebhook("Enemy");
         }

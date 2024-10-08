@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'; dotenv.config();
 import OpenAI from "openai";
 
+import { Discord } from '../_db/discord.js';
 
 let openai = undefined;
 
@@ -53,20 +54,23 @@ export async function IsScamEmail(body)
 
 }
 
-function GenerateQueriesFromContext(context)
+function GenerateQueriesFromContext(context, personality)
 {
 
 
     if(!context || (context?.length ?? 0) < 1)
         throw "!context || (context?.length ?? 0) < 1";
 
-    console.log("context.length: ", context.length);
+    // console.log("context.length: ", context.length);
 
     if(context.length % 2 == 0)
         throw "context.length % 2 == 0";
 
-    const systemText = "This email is a scam, reply to it like a very clueless person who speaks poor english - showing a lot of interest towards whatever they are offering";
-    const preText = "Your name is Seppo Varjus. Reply to this email: ";
+    const systemText = 
+    `Your name is Seppo Varjus.
+    You will never get sidetracked by unrelated questions - you will always try to force the recipient to stay in the topic (scam offer)`;
+
+    const preText = `This email is a scam, reply to it with this personality: '${personality}': `;
 
     const systemInput = { role: "system",  content: systemText };
 
@@ -96,10 +100,15 @@ function GenerateQueriesFromContext(context)
 export async function GenerateReplyToScam(context)
 {
 
-    const msgs = GenerateQueriesFromContext(context);
+    const personality = await Discord.GetPersonality();
 
-    console.log("context: ");
-    msgs.forEach(msg => console.log(msg));
+    if(!personality)
+        throw "GenerateReplyToScam(): !personality";
+
+    const msgs = GenerateQueriesFromContext(context, personality);
+
+    // console.log("context: ");
+    // msgs.forEach(msg => console.log(msg));
 
     const openAI = GetOpenAI();
     const completion = await openAI.chat.completions.create({

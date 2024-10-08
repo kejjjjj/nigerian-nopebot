@@ -37,9 +37,17 @@ export async function OnEmailReceived(email, id, threadId)
         console.log("this thread exists :)");
     }
 
+    const messages = await thread.GetMessages();
+
+    if(messages.length > 50){
+        console.error("too many messages in thread: ", threadId);
+        return;
+    }
+
+
     //send the target's message to discord
     await thread.SendMessageInDiscordThread(content, await GetWebhookByName("Enemy"));
-    const result = await GenerateReplyToScam(await thread.GetMessages());
+    const result = await GenerateReplyToScam(messages);
     
     const message = await GetGmail().users.messages.get({ userId: 'me', id: id });
 

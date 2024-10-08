@@ -27,12 +27,15 @@ export async function ConvertMessageClean(message) {
         }
 
         if(!subject?.length && !body?.length)
-            throw "!subject?.length && !body?.length";
+            return reject("!subject?.length && !body?.length");
 
-        body = CleanEmailBody(body.trim());
 
-        if(body.length === 0)
-            return reject(undefined);
+        const newbody = CleanEmailBody(body.trim());
+        body = newbody.length > 0 ? newbody : body;
+
+        if(body.length === 0){
+            return reject("body.length === 0");
+        }
 
         return resolve({
             subject: subject,

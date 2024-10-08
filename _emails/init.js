@@ -83,12 +83,10 @@ export async function EmailInit()
         const auth = GetAuth();
 
         gmail = google.gmail({ version: 'v1', auth });
-
         await PollEmails( auth );
         setInterval(async () => { await PollEmails( auth ); }, 60000);
 
     }catch(ex){
-
         console.log("ERROR: ", ex);
 
     }
