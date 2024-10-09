@@ -8,7 +8,7 @@ package.json
 # Databases
 *.sqlite
 
-
+log*
 
 # Environment variables
 .env
