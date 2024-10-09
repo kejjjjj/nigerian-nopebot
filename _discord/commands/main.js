@@ -2,6 +2,7 @@
 import { EmbedBuilder } from "discord.js";
 import dotenv from 'dotenv'; dotenv.config();
 
+import { GetDiscordClient } from '../main.js';
 import { DC_Personality } from './response.js';
 
 const admins = process.env.DISCORD_ADMINS.split(',');
@@ -76,3 +77,35 @@ export async function DC_OnMessageCreate(client, message)
     }
 
 } 
+
+
+export async function DC_SendNormalMessage(msg, channelId)
+{
+    try{
+        const client = GetDiscordClient();
+
+        if(!msg || !client)
+            throw "!msg || !client";
+
+        if(channelId){
+            const channel = client?.channels?.cache?.get(channelId);
+
+            if (channel) {
+                await ChannelMessage(channel, msg);
+            }
+
+            return;
+        }
+
+        //send message here
+        for(const id of TARGET_CHANNEL_IDS) {
+            const channel = client?.channels?.cache?.get(id);
+            if (channel) {
+                await ChannelMessage(channel, msg);
+            }
+        }
+
+    }catch(ex){
+        console.log("DC_SendNormalMessage(): ", ex);
+    }
+}

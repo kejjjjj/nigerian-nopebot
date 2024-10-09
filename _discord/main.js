@@ -43,12 +43,12 @@ export async function DC_StartBot() {
 
         console.log('Bot logged in successfully.');
 
-        if(!await GetWebhookByName("Enemy")){
-            await CreateWebhook("Enemy");
+        if(!await GetWebhookByName(process.env.WEBHOOK_TARGET)){
+            await CreateWebhook(process.env.WEBHOOK_TARGET);
         }
 
-        if(!await GetWebhookByName("Seppo Varjus")){
-            await CreateWebhook("Seppo Varjus");
+        if(!await GetWebhookByName(process.env.WEBHOOK_SELF)){
+            await CreateWebhook(process.env.WEBHOOK_SELF);
         }
 
     } catch (error) {

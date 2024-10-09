@@ -3,7 +3,6 @@ import { google } from 'googleapis';
 import { ConvertMessageClean } from './utils.js';
 
 import { GetAccessToken, GetAuth, GetGmail } from './init.js';
-
 import { OnEmailReceived } from './received.js';
 
 let lastMessageId = null;  // Store the last message ID you've processed

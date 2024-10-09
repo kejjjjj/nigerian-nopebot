@@ -67,8 +67,8 @@ function GenerateQueriesFromContext(context, personality)
         throw "context.length % 2 == 0";
 
     const systemText = 
-    `Your name is Seppo Varjus.
-    You will never get sidetracked by unrelated questions - you will always try to force the recipient to stay in the topic (scam offer)`;
+    `Your name is ${process.env.WHO_AM_I}.
+    You will never get sidetracked by unrelated questions - you will always try to force the recipient to stay in the topic (the first message)`;
 
     const preText = `This email is a scam, reply to it with this personality: '${personality}': `;
 

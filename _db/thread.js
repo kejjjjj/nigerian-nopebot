@@ -39,6 +39,8 @@ export class Thread extends Model
 
         }
 
+        //so that it's in a logical order :)
+        //0 being the oldest
         return results;
     }
 

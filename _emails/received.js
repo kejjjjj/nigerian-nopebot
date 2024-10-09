@@ -38,6 +38,7 @@ export async function OnEmailReceived(email, id, threadId)
     }
 
     const messages = await thread.GetMessages();
+    // messages.forEach(message => console.log(message));
 
     if(messages.length > 50){
         console.error("too many messages in thread: ", threadId);
@@ -46,7 +47,7 @@ export async function OnEmailReceived(email, id, threadId)
 
 
     //send the target's message to discord
-    await thread.SendMessageInDiscordThread(content, await GetWebhookByName("Enemy"));
+    await thread.SendMessageInDiscordThread(content, await GetWebhookByName(process.env.WEBHOOK_TARGET));
     const result = await GenerateReplyToScam(messages);
     
     const message = await GetGmail().users.messages.get({ userId: 'me', id: id });
@@ -58,5 +59,5 @@ export async function OnEmailReceived(email, id, threadId)
     await ReplyToThread(threadId, message, result);
 
     //send the reply to discord
-    await thread.SendMessageInDiscordThread(result, await GetWebhookByName("Seppo Varjus"));
+    await thread.SendMessageInDiscordThread(result, await GetWebhookByName(process.env.WEBHOOK_SELF));
 }
