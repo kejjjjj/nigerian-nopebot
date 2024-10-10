@@ -41,5 +41,5 @@ GUILD_ID = # the server, that has the bot\
 OPENAI_API_KEY= # self explanatory\
 COMMAND_ACTIVATION_CHANNELS= # comma separated list of channels where the discord bot will respond\
 DISCORD_ADMINS= # comma separated list of users who can use the bot's admin commands\
-WEBHOOK_SELF= # this client's name for the webhook\ 
+WEBHOOK_SELF= # this client's name for the webhook\
 WEBHOOK_TARGET= # target's name for the webhook
