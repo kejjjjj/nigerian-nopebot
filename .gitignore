@@ -8,7 +8,10 @@ package.json
 # Databases
 *.sqlite
 
+# Log files
 log*
 
 # Environment variables
 .env
+
+*.code-workspace

@@ -3,7 +3,7 @@ import { google } from 'googleapis';
 import { ConvertMessageClean } from './utils.js';
 
 import { GetAccessToken, GetAuth, GetGmail } from './init.js';
-import { OnEmailReceived } from './received.js';
+import { HandleLatestMessageInThread } from './received.js';
 
 let lastMessageId = null;  // Store the last message ID you've processed
 
@@ -44,7 +44,7 @@ async function ListCallback(err, res)
                         return;
                     }
 
-                    return await OnEmailReceived(data, latestMessage.id, latestMessage.threadId);
+                    return await HandleLatestMessageInThread(latestMessage.threadId, res, data);
                 }catch(ex){
                     console.error("Email parsing failure: ", ex);
                     return;

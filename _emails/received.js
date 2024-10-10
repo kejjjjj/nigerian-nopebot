@@ -1,62 +1,58 @@
 
-import { GetThreadFromDB } from './threads.js';
+import { CreateNewThread } from './threads.js';
 import { ReplyToThread } from './send.js';
-import { CleanEmailBody } from './utils.js';
 
-import { IsScamEmail, GenerateReplyToScam } from '../_openai/received.js';
-import { Thread } from '../_db/thread.js';
-import { DC_CreateThread, DC_GetThreadById } from '../_discord/threads.js';
+import { GenerateReplyToScam } from '../_openai/received.js';
 
-import { GetWebhookByName, CreateWebhook } from '../_discord/utils.js';
+import { GetWebhookByName } from '../_discord/utils.js';
 
 import { GetGmail } from './init.js';
+import { GetThreadData } from './inbox.js';
 
-export async function OnEmailReceived(email, id, threadId)
+export async function HandleLatestMessageInThread(threadId, rawMessage, email)
 {
-    let thread = await GetThreadFromDB(threadId); 
-    const content = email.content;
+    const gmailThread = await GetGmail().users.threads.get({
+        userId: 'me',
+        id: threadId,
+    });
 
-    if(!thread){
-        console.log("this thread does NOT exist yet");
+    const data = await GetThreadData(gmailThread);
 
-        //bye if you're not spam
-        if(!await IsScamEmail(content)){
-            console.log("not spam!");
-            return false;
-        }
+    if(!data)
+        return;
 
-        console.log("is spam!");
-        thread = await Thread.NewThread(threadId);
-        await thread.SetSender(email.from);
-
-        const discordThread = await DC_CreateThread(email.from);
-
-        await thread.SetDiscordThreadId(discordThread.id);
-
-    } else{
-        console.log("this thread exists :)");
+    if(!await data.NeedsResponse()){
+        console.log("no response needed");
+        return;
     }
+
+    console.log("response needed!");
+
+    const thread = data.ThreadExists() ? data.thread : await CreateNewThread(threadId, email);
+
+    if(!thread)
+        throw "HandleLatestMessageInThread(): !thread";
 
     const messages = await thread.GetMessages();
     // messages.forEach(message => console.log(message));
 
-    if(messages.length > 50){
+    if(messages.length > 100){
         console.error("too many messages in thread: ", threadId);
         return;
     }
 
 
     //send the target's message to discord
-    await thread.SendMessageInDiscordThread(content, await GetWebhookByName(process.env.WEBHOOK_TARGET));
-    const result = await GenerateReplyToScam(messages);
-    
-    const message = await GetGmail().users.messages.get({ userId: 'me', id: id });
+    //but don't send a duplicate if this thread was created now
+    if(data.ThreadExists())
+        await thread.SendMessageInDiscordThread(email.content, await GetWebhookByName(process.env.WEBHOOK_TARGET));
 
-    if(!message)
-        throw "OnEmailReceived(): !message";
+    const result = await GenerateReplyToScam(messages);
+    if(!result)
+        throw "HandleLatestMessageInThread(): !result";
 
     //reply to the email
-    await ReplyToThread(threadId, message, result);
+    await ReplyToThread(threadId, rawMessage, result);
 
     //send the reply to discord
     await thread.SendMessageInDiscordThread(result, await GetWebhookByName(process.env.WEBHOOK_SELF));

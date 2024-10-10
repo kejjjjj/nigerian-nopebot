@@ -54,6 +54,30 @@ export async function IsScamEmail(body)
 
 }
 
+function GetMyLatestMessage(messages)
+{
+    let latest = undefined;
+
+    for(const message of messages){
+        if(message.from.includes(process.env.EMAIL_ADDRESS))
+            latest = message;
+    }
+
+    return latest;
+}
+
+function GetAllScammerMessages(messages)
+{
+    let msgs = [];
+
+    for(const message of messages){
+        if(!message.from.includes(process.env.EMAIL_ADDRESS))
+            msgs.push(message);
+    }
+
+    return msgs;
+}
+
 function GenerateQueriesFromContext(context, personality)
 {
 
@@ -63,36 +87,47 @@ function GenerateQueriesFromContext(context, personality)
 
     // console.log("context.length: ", context.length);
 
-    if(context.length % 2 == 0)
-        throw "context.length % 2 == 0";
-
     const systemText = 
     `Your name is ${process.env.WHO_AM_I}.
-    You will never get sidetracked by unrelated questions - you will always try to force the recipient to stay in the topic (the first message)`;
-
-    const preText = `This email is a scam, reply to it with this personality: '${personality}': `;
+    This is your personality: '${personality}'.
+    You will never get sidetracked by unrelated questions - you will always try to force the recipient to stay in the topic (the first message),
+    but you will still prioritize the most recent message.
+    The "Scammer:" and "Me:" text in front replies only indicate the role. do NOT include the roleplay in your response.`;
 
     const systemInput = { role: "system",  content: systemText };
 
     if(context.length === 1){
-        const prompt = preText + context[0].content;
+        const prompt = "Scammer: " + context[0].content;
         const userInput = { role: "user",  content: prompt };
 
         return [ systemInput, userInput ];
     }
 
-    if(context.length < 3) //assumes -> target, self, target
-        throw "context.length < 3";
+    const scammerMessages = GetAllScammerMessages(context);
+
+    if(!scammerMessages || scammerMessages.length < 1)
+        throw "!scammerMessages || scammerMessages.length < 1";
 
     //initial message for context 
-    const firstMessage = { role: "user",  content: context[0].content };
+    const firstPrompt = "Scammer: " + scammerMessages[0].content;
+    const firstMessage = { role: "user",  content: firstPrompt };
     
+    if(scammerMessages.length === 1)
+        return [ systemInput, firstMessage ];
+
     //what the target said now
-    const prompt = preText + context[context.length - 1].content;
+    const prompt = "Scammer: " + scammerMessages[scammerMessages.length - 1].content;
     const lastMessage = { role: "user", content: prompt };
 
     //what the ai sent previously
-    const myMessage = { role: "assistant",  content: context[context.length - 2].content };
+    const myMessageObj = GetMyLatestMessage(context);
+
+    if(!myMessageObj){
+        return [ systemInput, firstMessage, lastMessage ];
+    }
+
+    const myPrompt = "Me: " + myMessageObj.content;
+    const myMessage = { role: "assistant",  content: myPrompt };
     
     return [ systemInput, firstMessage, myMessage, lastMessage ];
 }
