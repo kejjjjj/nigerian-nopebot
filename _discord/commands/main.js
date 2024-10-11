@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import dotenv from 'dotenv'; dotenv.config();
 
 import { GetDiscordClient } from '../main.js';
-import { DC_Personality } from './response.js';
+import { DC_Personality, DC_Dig } from './response.js';
 
 const admins = process.env.DISCORD_ADMINS.split(',');
 const TARGET_CHANNEL_IDS = process.env.COMMAND_ACTIVATION_CHANNELS.split(',');
@@ -11,7 +11,8 @@ const TARGET_CHANNEL_IDS = process.env.COMMAND_ACTIVATION_CHANNELS.split(',');
 export function isAdmin(userid) { return admins.findIndex(admin => admin === userid) !== -1; }
 
 const commands = [
-    { name: "personality", callback: DC_Personality,  adminOnly: true },
+    { name: "personality",  callback: DC_Personality,  adminOnly: true },
+    { name: "dig",          callback: DC_Dig,          adminOnly: true },
 ];
 
 

@@ -3,6 +3,9 @@ import dotenv from 'dotenv'; dotenv.config();
 export async function ConvertMessageClean(message) {
     return new Promise((resolve, reject) => {
 
+        if(!message || !message.payload)
+            return reject("!message || !message.payload");
+
         const headers = message.payload.headers || [];
 
         let body = '';
@@ -16,15 +19,21 @@ export async function ConvertMessageClean(message) {
 
         if (parts.length > 0) {
             parts.forEach((part) => {
-                if (part.mimeType === 'text/plain') {
-                    body += Buffer.from(part.body.data, 'base64').toString('utf-8'); // Plain text part
+                if (part.mimeType === 'text/plain' && part.body?.data) {
+                    const decodedPart = Buffer.from(part.body.data, 'base64').toString('utf-8');
+                    if (decodedPart.trim().length > 0) {
+                        body += decodedPart; // Append non-empty decoded part
+                    }
                 }
             });
         }
 
+        // If no valid part found, fallback to the main body
         if (!body.length && message.payload.body?.data) {
-            body = Buffer.from(message.payload.body.data, 'base64').toString('utf-8');
+            const decodedMainBody = Buffer.from(message.payload.body.data, 'base64').toString('utf-8');
+            body = decodedMainBody.trim(); // Trim the decoded body
         }
+
 
         if(!subject?.length && !body?.length)
             return reject("!subject?.length && !body?.length");
@@ -33,9 +42,9 @@ export async function ConvertMessageClean(message) {
         const newbody = CleanEmailBody(body.trim());
         body = newbody.length > 0 ? newbody : body;
 
-        if(body.length === 0){
-            return reject("body.length === 0");
-        }
+        // if(body.length === 0){
+        //     return reject("body.length === 0");
+        // }
 
         return resolve({
             subject: subject,

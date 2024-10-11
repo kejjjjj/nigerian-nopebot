@@ -3,8 +3,7 @@ import { FormatEmailReply } from './utils.js';
 import { GetGmail } from './init.js';
 
 export async function ReplyToThread(threadId, message, content)
-{
-
+{  
     const gmail = GetGmail();
     const email = FormatEmailReply(message, content); // format as RFC 2822 string
   
