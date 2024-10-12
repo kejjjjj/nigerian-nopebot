@@ -10,8 +10,7 @@
 - **Google Account**: You’ll need access to a Gmail account with IMAP enabled (use a burner account to avoid getting banned).
 - **Gmail API Access**: Set up and configure your Gmail API credentials.
 - **OpenAI API Key**: Generate an API key from your OpenAI account to access GPT models.
-- **Discord Account & Bot**: Set up a Discord bot with the required permissions to communicate with the Scam Email Responder Bot.
-- **Bot Hosting**: A server or cloud environment to run both the Discord bot and the Scam Email Responder Bot.
+- **Discord Account & Bot**: Set up a Discord bot with the required permissions to communicate with the bot.
 
 #### All configuration, including managing personalities, and email responses, is handled via the Discord bot.
 ---
