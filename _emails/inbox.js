@@ -11,6 +11,8 @@ import { IsScamEmail } from '../_openai/received.js';
 
 import { DC_SendNormalMessage } from '../_discord/commands/main.js';
 
+import { threadQueue } from './queue.js';
+
 function MessageWasSentByMe(message)
 {
     const headers = message?.data?.payload?.headers;
@@ -87,40 +89,48 @@ export async function GoThroughLastNumThreadsInInbox(count)
 
     const threads = res.data.threads || [];
 
+
     await DC_SendNormalMessage(`Going through the last ${threads.length} threads!\nEstimated time: ${threads.length * 5 / 60} minutes`);
 
-    for(const _thread of threads){
+    threads.forEach(thread => threadQueue.AddThread(thread.id));
 
-        await Delay(5000);
+    try{
+        if(!threadQueue.IsActive())
+            await threadQueue.ProcessEntireQueue();
 
-        try{
-            const thread = await gmail.users.threads.get({
-                userId: 'me',
-                id: _thread.id,
-            });
-
-            if(!thread || !thread.data.messages){
-                await DC_SendNormalMessage(`No messages in thread: ${thread.data.id}!`);
-                continue;
-            }
-
-            const latestMessage = thread.data.messages[0];
-            const data = await ConvertMessageClean(latestMessage);
-
-            if(!data){
-                console.error("received bad data, ignoring...");
-                continue;
-            }
-
-            const obj = { data: { ...latestMessage } };
-            await HandleLatestMessageInThread(thread, obj, data);
-        }catch(ex){
-            console.error("Error: ", ex);
-            continue;
-        }
+    }catch(ex){
+        console.error("Error: ", ex);
+        return;
     }
 
     await Delay(2000);
-    await DC_SendNormalMessage(`Finished!`);
+    if(!threadQueue.IsActive())
+        await DC_SendNormalMessage(`Finished!`);
 
+}
+
+export async function ProcessThread(threadId)
+{
+    const gmail = GetGmail();
+
+    const thread = await gmail.users.threads.get({
+        userId: 'me',
+        id: threadId,
+    });
+
+    if(!thread || !thread.data.messages){
+        await DC_SendNormalMessage(`No messages in thread: ${thread.data.id}!`);
+        return;
+    }
+
+    const latestMessage = thread.data.messages[0];
+    const data = await ConvertMessageClean(latestMessage);
+
+    if(!data){
+        console.error("received bad data, ignoring...");
+        return;
+    }
+
+    const obj = { data: { ...latestMessage } };
+    await HandleLatestMessageInThread(thread, obj, data);
 }

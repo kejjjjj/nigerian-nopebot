@@ -4,6 +4,7 @@ import { ConvertMessageClean } from './utils.js';
 
 import { GetAccessToken, GetAuth, GetGmail } from './init.js';
 import { HandleLatestMessageInThreadWithId } from './received.js';
+import { threadQueue } from './queue.js';
 
 let lastMessageId = null;  // Store the last message ID you've processed
 
@@ -44,7 +45,11 @@ async function ListCallback(err, res)
                         return;
                     }
 
-                    return await HandleLatestMessageInThreadWithId(latestMessage.threadId, res, data);
+                    threadQueue.AddThread(latestMessage.threadId);
+
+                    if(!threadQueue.IsActive())
+                        await threadQueue.ProcessEntireQueue();
+
                 }catch(ex){
                     console.error("Email parsing failure: ", ex);
                     return;

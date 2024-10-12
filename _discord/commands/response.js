@@ -4,6 +4,8 @@ import { Discord } from '../../_db/discord.js';
 
 import { GoThroughLastNumThreadsInInbox } from '../../_emails/inbox.js';
 
+import { threadQueue } from '../../_emails/queue.js';
+
 export async function DC_Personality(message, args)
 {
 
@@ -30,9 +32,19 @@ export async function DC_Dig(message, args)
 {
 
     if((args?.length ?? 0) !== 1)
-        return SendFailureMessage(message, "Syntax Error", "Expected <count>");
+        return SendFailureMessage(message, "Syntax Error", "Expected <count or cancel>");
 
     const [ count ] = args;
+
+    if(count === "cancel"){
+
+        if(threadQueue.IsActive()){
+            threadQueue.AbortQueue();
+            return SendSuccessMessage(message, "Success", `Cancelling...`);
+        }
+
+        return SendFailureMessage(message, "Error", `there is nothing to cancel`);
+    }
 
     if(!Number.isInteger(+count))
         return SendFailureMessage(message, "Error", `${count} is not an integer`);
@@ -42,4 +54,3 @@ export async function DC_Dig(message, args)
 
     await GoThroughLastNumThreadsInInbox(count);
 }
-
