@@ -37,7 +37,7 @@ export class ThreadQueue
 
         this.m_bActive = true;
 
-        for(const thread of this.m_arrThreads){
+        while(this.m_arrThreads.length > 0){
 
             if(!this.IsActive()){
                 break;
@@ -46,10 +46,12 @@ export class ThreadQueue
             await Delay(5000);
 
             try{
-                await ProcessThread(thread);
+                await ProcessThread(this.m_arrThreads[0]);
             }catch(error){
                 console.error(error);
             }
+
+            this.m_arrThreads.shift();
         }
 
         this.m_arrThreads = [];

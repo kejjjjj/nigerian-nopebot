@@ -26,6 +26,9 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
     if(!data)
         return;
 
+    if(email.from.toLowerCase().includes("mail delivery subsystem"))
+        return;
+
     if(!rawMessage || !rawMessage.data || !rawMessage.data.payload)
         throw "HandleLatestMessageInThread(): !rawMessage || !rawMessage.data || !rawMessage.data.payload";
 
