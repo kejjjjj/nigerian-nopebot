@@ -1,3 +1,4 @@
+import dotenv from 'dotenv'; dotenv.config();
 
 import { CreateNewThread } from './threads.js';
 import { ReplyToThread } from './send.js';
@@ -8,6 +9,9 @@ import { GetWebhookByName } from '../_discord/utils.js';
 
 import { GetGmail } from './init.js';
 import { GetThreadData } from './inbox.js';
+
+import { DC_SendNormalMessage } from '../_discord/commands/main.js';
+
 
 export async function HandleLatestMessageInThreadWithId(threadId, rawMessage, email)
 {
@@ -26,7 +30,7 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
     if(!data)
         return;
 
-    if(email.from.toLowerCase().includes("mail delivery subsystem"))
+    if(email.from.includes("googlemail.com"))
         return;
 
     if(!rawMessage || !rawMessage.data || !rawMessage.data.payload)
@@ -61,16 +65,20 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
     //send the target's message to discord
     //but don't send a duplicate if this thread was created now
     if(data.ThreadExists())
-        await thread.SendMessageInDiscordThread(email.content, await GetWebhookByName(process.env.WEBHOOK_TARGET));
+        await thread.SendMessageInDiscordThread(messages[messages.length-1].content, await GetWebhookByName(process.env.WEBHOOK_TARGET));
+
+    const url = await thread.GetLatestMessageDiscordURL();
+    const msg = `Replied to ${url}!`;
 
     const result = await GenerateReplyToScam(messages);
     if(!result)
         throw "HandleLatestMessageInThread(): !result";
 
-
-    console.log("reply");
     //reply to the email
     await ReplyToThread(threadId, rawMessage, result);
+
+
+    await DC_SendNormalMessage(msg);
 
     //send the reply to discord
     await thread.SendMessageInDiscordThread(result, await GetWebhookByName(process.env.WEBHOOK_SELF));
