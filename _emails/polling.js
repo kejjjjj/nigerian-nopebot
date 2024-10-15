@@ -6,6 +6,9 @@ import { GetAccessToken, GetAuth, GetGmail } from './init.js';
 import { HandleLatestMessageInThreadWithId } from './received.js';
 import { threadQueue } from './queue.js';
 
+import { DC_SendNormalMessage } from '../_discord/commands/main.js';
+
+
 let lastMessageId = null;  // Store the last message ID you've processed
 
 async function ListCallback(err, res)
@@ -45,10 +48,21 @@ async function ListCallback(err, res)
                         return;
                     }
 
-                    threadQueue.AddThread(latestMessage.threadId);
+                    // Generate a random number between 15 and 120 minutes in milliseconds
+                    const minDelay = 5 * 60 * 1000; // 15 minutes
+                    const maxDelay = 120 * 60 * 1000; // 120 minutes
+                    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+                    
+                    await DC_SendNormalMessage(`Email received! This email will be processed in ${delay / 1000 / 60} minutes!`);
 
-                    if(!threadQueue.IsActive())
-                        await threadQueue.ProcessEntireQueue();
+                    setTimeout(async () => {
+
+                        threadQueue.AddThread(latestMessage.threadId);
+
+                        if(!threadQueue.IsActive())
+                            await threadQueue.ProcessEntireQueue();
+
+                    }, delay);
 
                 }catch(ex){
                     console.error("Email parsing failure: ", ex);

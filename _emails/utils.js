@@ -1,5 +1,11 @@
 import dotenv from 'dotenv'; dotenv.config();
 
+export function CleanRoleplay(message) {
+    return message.replace(/^(me:\s*)+/i, '').trim();
+}
+export function Delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 export async function ConvertMessageClean(message) {
     return new Promise((resolve, reject) => {
 
@@ -45,6 +51,8 @@ export async function ConvertMessageClean(message) {
         // if(body.length === 0){
         //     return reject("body.length === 0");
         // }
+
+        body = CleanRoleplay(body);
 
         return resolve({
             subject: subject,

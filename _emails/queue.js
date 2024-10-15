@@ -1,6 +1,6 @@
 
 import { ProcessThread } from './inbox.js';
-import { Delay } from './threads.js';
+import { Delay } from './utils.js';
 
 export class ThreadQueue
 {

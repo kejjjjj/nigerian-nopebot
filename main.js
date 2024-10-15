@@ -8,7 +8,7 @@ import { EmailInit, GetAuth, OAuth, RefreshCallback, GetAccessToken } from './_e
 import { DC_StartBot } from './_discord/main.js';
 
 import { sequelize } from './_db/associations.js';
-
+import { DeleteAllDiscordContent } from './_db/main.js';
 
 dotenv.config();
 
@@ -63,10 +63,12 @@ async function Init()
         if(!sequelize)
             throw "Expression: !sequelize";
 
+        
         await sequelize.sync();
 
-        await DC_StartBot();
-        await EmailInit();
+         await DC_StartBot();
+         await DeleteAllDiscordContent();
+        // await EmailInit();
                 
     }catch(ex){
         console.error(ex);

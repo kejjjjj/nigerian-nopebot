@@ -16,7 +16,6 @@ export async function CreateThread(channel, threadName) {
     }
 }
 
-
 export async function GetChannelById(channelId) {
     try {
         const channel = await GetDiscordClient().channels.fetch(channelId);
@@ -25,30 +24,4 @@ export async function GetChannelById(channelId) {
         console.error('GetChannelById():', error);
         return undefined;
     }
-}
-
-export async function GetWebhooks()
-{
-    const guild = await GetDiscordClient().guilds.fetch(process.env.GUILD_ID);
-    const webhooks = await guild.fetchWebhooks();
-
-    return webhooks;
-}
-export async function GetWebhookByName(name)
-{
-    const webhooks = await GetWebhooks();
-
-    return webhooks.find(webhook => webhook.name === name);
-}
-export async function CreateWebhook(name)
-{
-    const channel = await GetDiscordClient().channels.fetch(process.env.CHANNEL_ID);
-    
-    const webhook = await channel.createWebhook({
-        name: name
-    });
-    
-    console.log(`Webhook created! Name: ${webhook.name}, URL: ${webhook.url}`);
-    return webhook;
-    
 }

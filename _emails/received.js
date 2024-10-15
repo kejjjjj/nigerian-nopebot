@@ -1,11 +1,8 @@
 import dotenv from 'dotenv'; dotenv.config();
 
-import { CreateNewThread } from './threads.js';
 import { ReplyToThread } from './send.js';
 
 import { GenerateReplyToScam } from '../_openai/received.js';
-
-import { GetWebhookByName } from '../_discord/utils.js';
 
 import { GetGmail } from './init.js';
 import { GetThreadData } from './inbox.js';
@@ -30,7 +27,8 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
     if(!data)
         return;
 
-    if(email.from.includes("googlemail.com"))
+    //error message!
+    if(email.content.includes("The response from the remote server was:"))
         return;
 
     if(!rawMessage || !rawMessage.data || !rawMessage.data.payload)

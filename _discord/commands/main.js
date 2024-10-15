@@ -5,12 +5,15 @@ import dotenv from 'dotenv'; dotenv.config();
 import { GetDiscordClient } from '../main.js';
 import { DC_Personality, DC_Dig } from './response.js';
 
+import { sequelize } from '../../_db/associations.js';
+
 const admins = process.env.DISCORD_ADMINS.split(',');
 const TARGET_CHANNEL_IDS = process.env.COMMAND_ACTIVATION_CHANNELS.split(',');
 
 export function isAdmin(userid) { return admins.findIndex(admin => admin === userid) !== -1; }
 
 const commands = [
+    { name: "reset",        callback: DC_Reset,        adminOnly: true },
     { name: "personality",  callback: DC_Personality,  adminOnly: true },
     { name: "dig",          callback: DC_Dig,          adminOnly: true },
 ];
@@ -79,6 +82,25 @@ export async function DC_OnMessageCreate(client, message)
 
 } 
 
+export async function DC_Reset(message, args)
+{
+    if((args?.length ?? 0) !== 1)
+        return SendFailureMessage(message, "Syntax Error", "expected <query>");
+
+    const client = GetDiscordClient();
+    const query = args[0];
+
+    switch(query){
+        case "everything":
+            
+            return SendSuccessMessage(message, "Success!", "The entire database has been wiped (including discord threads)!");
+
+        default:
+            return SendFailureMessage(message, "Syntax Error", "Unrecognized query!");
+            break;
+    }    
+
+}
 
 export async function DC_SendNormalMessage(msg, channelId)
 {
@@ -110,3 +132,4 @@ export async function DC_SendNormalMessage(msg, channelId)
         console.log("DC_SendNormalMessage(): ", ex);
     }
 }
+
