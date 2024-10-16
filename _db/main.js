@@ -1,40 +1,7 @@
 
 import { sequelize } from './associations.js';
-import { Guild, Channel, Thread } from './thread.js';
+import { Guild } from './discord.js';
 import { GetDiscordClient } from '../_discord/main.js';
-
-export async function DeleteAllDiscordContent()
-{
-    const channel = await GetDiscordClient().channels.fetch(process.env.CHANNEL_ID);
-    const allthreads = await channel.threads.fetchActive();
-
-    allthreads.threads.forEach(async (thread) => {
-        try {
-          await thread.delete();
-          console.log(`Deleted thread: ${thread.name}`);
-        } catch (error) {
-          console.error(`Failed to delete thread: ${thread.name}`, error);
-        }
-      });
-      
-    console.log("threads have been erased");
-
-    const guild = await GetDiscordClient().guilds.fetch(process.env.GUILD_IDS);
-
-    if(!guild)
-        throw "Guild::GetWebhooks(): !guild";
-
-    const webhooks = await guild.fetchWebhooks();
-
-    webhooks.forEach(async (webhook) => {
-        try {
-          await webhook.delete();
-          console.log(`Deleted webhook: ${webhook.name}`);
-        } catch (error) {
-          console.error(`Failed to delete webhook: ${webhook.name}`, error);
-        }
-      });
-}
 
 
 export async function DeleteEverything()

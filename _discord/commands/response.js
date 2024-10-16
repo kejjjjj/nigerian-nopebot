@@ -1,6 +1,6 @@
 
 import { isAdmin, SendMessage, SendFailureMessage, SendSuccessMessage } from './main.js';
-import { Discord } from '../../_db/discord.js';
+import { Discord, Guild } from '../../_db/discord.js';
 
 import { GoThroughLastNumThreadsInInbox } from '../../_emails/inbox.js';
 

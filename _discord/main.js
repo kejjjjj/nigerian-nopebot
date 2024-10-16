@@ -1,6 +1,7 @@
 
 import { Client, GatewayIntentBits, EmbedBuilder, ThreadChannel } from "discord.js";
 import { Discord } from '../_db/discord.js';
+import { Guilds_Init } from '../_db/discord.js';
 
 import { DC_OnMessageCreate } from './commands/main.js';
 
@@ -36,19 +37,13 @@ export async function DC_StartBot() {
     }); 
 
     try {
-
-        await Discord.Init(); //register the database
         await client.login(process.env.DISCORD_BOT_TOKEN);
 
-        // console.log('Bot logged in successfully.');
+        await Guilds_Init(); //register guilds and channels
+        await Discord.Init(); //register the discord database
 
-        // if(!await GetWebhookByName(process.env.WEBHOOK_TARGET)){
-        //     await CreateWebhook(process.env.WEBHOOK_TARGET);
-        // }
+        console.log('Bot logged in successfully.');
 
-        // if(!await GetWebhookByName(process.env.WEBHOOK_SELF)){
-        //     await CreateWebhook(process.env.WEBHOOK_SELF);
-        // }
 
     } catch (error) {
         console.error('Failed to login:', error);

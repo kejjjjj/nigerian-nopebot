@@ -6,9 +6,11 @@ import { GetDiscordClient } from '../main.js';
 import { DC_Personality, DC_Dig } from './response.js';
 
 import { sequelize } from '../../_db/associations.js';
+import { DeleteEverything } from '../../_db/main.js';
+
+import { GetTargetChannelIds } from '../../_db/discord.js'; 
 
 const admins = process.env.DISCORD_ADMINS.split(',');
-const TARGET_CHANNEL_IDS = process.env.COMMAND_ACTIVATION_CHANNELS.split(',');
 
 export function isAdmin(userid) { return admins.findIndex(admin => admin === userid) !== -1; }
 
@@ -48,6 +50,7 @@ export function SendSuccessMessage(message, title, description)
 
 export async function DC_OnMessageCreate(client, message)
 {
+    const TARGET_CHANNEL_IDS = await GetTargetChannelIds();
     try{
 
         if(!TARGET_CHANNEL_IDS.includes(message.channel.id) && message.author.id !== client.user.id)
@@ -92,9 +95,8 @@ export async function DC_Reset(message, args)
 
     switch(query){
         case "everything":
-            
+            await DeleteEverything();
             return SendSuccessMessage(message, "Success!", "The entire database has been wiped (including discord threads)!");
-
         default:
             return SendFailureMessage(message, "Syntax Error", "Unrecognized query!");
             break;
@@ -104,6 +106,7 @@ export async function DC_Reset(message, args)
 
 export async function DC_SendNormalMessage(msg, channelId)
 {
+
     try{
         const client = GetDiscordClient();
 
@@ -119,6 +122,8 @@ export async function DC_SendNormalMessage(msg, channelId)
 
             return;
         }
+
+        const TARGET_CHANNEL_IDS = await GetTargetChannelIds();
 
         //send message here
         for(const id of TARGET_CHANNEL_IDS) {

@@ -6,6 +6,9 @@ import { GenerateReplyToScam } from '../_openai/received.js';
 
 import { GetGmail } from './init.js';
 import { GetThreadData } from './inbox.js';
+import { CreateNewThread } from './threads.js';
+
+import { Channel } from '../_db/discord.js';
 
 import { DC_SendNormalMessage } from '../_discord/commands/main.js';
 
@@ -27,12 +30,12 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
     if(!data)
         return;
 
-    //error message!
-    if(email.content.includes("The response from the remote server was:"))
-        return;
-
     if(!rawMessage || !rawMessage.data || !rawMessage.data.payload)
         throw "HandleLatestMessageInThread(): !rawMessage || !rawMessage.data || !rawMessage.data.payload";
+
+    //error message!
+    if(email.content.length < 1 || email.content.includes("The response from the remote server was:"))
+        return;
 
     if(!await data.NeedsResponse()){
         console.log("no response needed");
@@ -53,20 +56,19 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
         throw "HandleLatestMessageInThread(): !messages";
     }
 
-    // messages.forEach(message => console.log(message));
-
     if(messages.length > 100){
         console.error("too many messages in thread: ", threadId);
         return;
     }
 
+    const discordThreads = await thread.GetAllDiscordThreads();
+
     //send the target's message to discord
     //but don't send a duplicate if this thread was created now
-    if(data.ThreadExists())
-        await thread.SendMessageInDiscordThread(messages[messages.length-1].content, await GetWebhookByName(process.env.WEBHOOK_TARGET));
-
-    const url = await thread.GetLatestMessageDiscordURL();
-    const msg = `Replied to ${url}!`;
+    if(data.ThreadExists()){
+        for(const dcThread of discordThreads)
+            await dcThread.SendMessageInThread(messages[messages.length-1].content, await dcThread.GetWebhookByName(process.env.WEBHOOK_TARGET));
+    }
 
     const result = await GenerateReplyToScam(messages);
     if(!result)
@@ -75,9 +77,23 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
     //reply to the email
     await ReplyToThread(threadId, rawMessage, result);
 
+    for(const dcThread of discordThreads){
 
-    await DC_SendNormalMessage(msg);
+        //send the reply to discord
+        await dcThread.SendMessageInThread(result, await dcThread.GetWebhookByName(process.env.WEBHOOK_SELF));
 
-    //send the reply to discord
-    await thread.SendMessageInDiscordThread(result, await GetWebhookByName(process.env.WEBHOOK_SELF));
+        //notify the servers :)
+        const url = await dcThread.GetLatestMessageDiscordURL();
+        const msg = `Replied to ${url}!`;
+
+        const channel = await Channel.findByPk(dcThread.channelId);
+
+        if(channel){
+            await DC_SendNormalMessage(msg, channel.channelId);
+        }
+        else
+            console.error("HandleLatestMessageInThread(): !(await Channel.findByPk(dcThread.channelId))");
+    
+
+    }
 }

@@ -1,8 +1,8 @@
 import dotenv from 'dotenv'; dotenv.config();
 
 import { GetGmail } from './init.js';
-import { ConvertMessageClean } from './utils.js';
-import { GetThreadFromDB, Delay } from './threads.js';
+import { ConvertMessageClean, Delay } from './utils.js';
+import { GetThreadFromDB } from './threads.js';
 import { HandleLatestMessageInThread } from './received.js';
 
 import { Thread } from '../_db/thread.js';
@@ -80,6 +80,9 @@ export async function GoThroughLastNumThreadsInInbox(count)
 {
 
     count = Math.max( Math.max(0, count), Math.min(500, count) );
+
+    if(!count)
+        return;
 
     const gmail = GetGmail();
     const res = await gmail.users.threads.list({
