@@ -35,7 +35,7 @@ export async function GetTargetChannelIds()
         }
 
         target_ids.push(channel.channelId);
-        console.log(`cached ${target_ids.length} target channels!`);
+        console.log(`Cached ${target_ids.length} target channel(s)!`);
     }
 
     return target_ids;
@@ -72,11 +72,11 @@ export class Guild extends Model
             throw `Guild::Init(): !dbChannel (${this.guildId})`;
         }
         
-        if(!await this.GetWebhookByName(process.env.WEBHOOK_TARGET)){
+        if(!await dbChannel.GetWebhookByName(process.env.WEBHOOK_TARGET)){
             await dbChannel.CreateWebhook(process.env.WEBHOOK_TARGET);
         }
 
-        if(!await this.GetWebhookByName(process.env.WEBHOOK_SELF)){
+        if(!await dbChannel.GetWebhookByName(process.env.WEBHOOK_SELF)){
             await dbChannel.CreateWebhook(process.env.WEBHOOK_SELF);
         }
 
@@ -91,28 +91,45 @@ export class Guild extends Model
             throw `Guild::CreateChannelIfNecessary(): !dcGuild (${this.guildId})`;
         }
 
-        const dcChannel = await dcGuild.channels.cache.find(channel => channel.name === process.env.CHANNEL_NAME);
+        const channels = await dcGuild.channels.fetch(); // Fetch all channels
+
+        let dcChannel = undefined; // Replace with the channel name
+
+        channels.forEach(channel => {
+            if (channel.name === process.env.CHANNEL_NAME) {
+                dcChannel = channel;
+            }
+        });
+
         const dbChannel = await Channel.findOne({where: {guildId: this.id}});
+
+
+        if(dcChannel && dbChannel)
+            return dbChannel;
 
         //channel exists, but it's not in the database -> delete
         if(dcChannel && !dbChannel){
+            console.log("Deleting the discord channel!");
             await dcChannel.delete();
+            dcChannel = undefined;
         }
 
+        if(!dcChannel){
+            dcChannel = await dcGuild.channels.create({
+                name: process.env.CHANNEL_NAME,
+                autoArchiveDuration: 10080, //one week
+                reason: "yep"
+            });
+            console.log("Creating a new channel!");
+
+        }
+        
         if(dbChannel)
-            return dbChannel;
-
-        console.log("Creating a new channel!");
-
-        const channel = await dcGuild.channels.create({
-            name: process.env.CHANNEL_NAME,
-            autoArchiveDuration: 10080, //one week
-            reason: "yep"
-        });
+            await Channel.destroy({where: {id: dbChannel.id}});
 
         return await Channel.create({
             guildId: this.id,
-            channelId: channel.id
+            channelId: dcChannel.id
         });
 
     }

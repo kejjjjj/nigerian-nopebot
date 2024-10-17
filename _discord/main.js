@@ -46,7 +46,7 @@ export async function DC_StartBot() {
 
 
     } catch (error) {
-        console.error('Failed to login:', error);
+        console.log('Failed to login:', error);
     }
 
     return;    
