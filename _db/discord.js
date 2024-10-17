@@ -10,7 +10,7 @@ const GUILD_IDS = process.env.GUILD_IDS.split(',');
 let target_ids = undefined;
 export async function GetTargetChannelIds()
 {
-    if(target_ids)
+    if(target_ids && GUILD_IDS.length === target_ids.length)
         return target_ids;
 
     target_ids = [];
@@ -54,7 +54,7 @@ export async function Guilds_Init()
 
         if(!dbGuild){
             dbGuild = await Guild.create({guildId: id});
-            console.log("Creating new guild!");
+            console.log("Creating a new guild!");
         }
 
         await dbGuild.Init();
@@ -139,6 +139,17 @@ export class Guild extends Model
             where: {}, 
             truncate: true
         });
+
+        const dcGuild = await GetDiscordClient().guilds.fetch(this.guildId);
+
+        if(!dcGuild){
+            throw `Guild::Destructor(): !dcGuild (${this.guildId})`;
+        }
+        
+        const dcChannel = await dcGuild.channels.cache.find(channel => channel.name === process.env.CHANNEL_NAME);
+        if(dcChannel){
+            await dcChannel.delete();
+        }
     }
 
     async GetWebhooks()

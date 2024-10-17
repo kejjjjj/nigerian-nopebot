@@ -154,6 +154,10 @@ function GenerateQueriesFromContext(context)
     return queries;
 
 }
+function replaceWordCaseInsensitive(text, target, replacement) {
+    const regex = new RegExp(target, 'gi');
+    return text.replace(regex, replacement);
+}
 export async function GenerateReplyToScam(context)
 {
 
@@ -178,5 +182,5 @@ export async function GenerateReplyToScam(context)
     if(!str)
         throw "GenerateReplyToScam(): !str";
 
-    return CleanRoleplay(str);
+    return replaceWordCaseInsensitive(CleanRoleplay(str), "scammer", "friend");
 }

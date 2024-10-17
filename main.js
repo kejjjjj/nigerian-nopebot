@@ -62,7 +62,7 @@ async function Init()
             throw "Expression: !sequelize";
 
         
-        await sequelize.sync({force: true});
+        await sequelize.sync();
 
         await DC_StartBot();
         await EmailInit();

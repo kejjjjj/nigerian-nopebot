@@ -34,7 +34,9 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
         throw "HandleLatestMessageInThread(): !rawMessage || !rawMessage.data || !rawMessage.data.payload";
 
     //error message!
-    if(email.content.length < 1 || email.content.includes("The response from the remote server was:"))
+    if(email.content.length < 1 
+        || email.content.includes("The response from the remote server was:")
+        || email.content.includes("The response was:"))
         return;
 
     if(!await data.NeedsResponse()){
