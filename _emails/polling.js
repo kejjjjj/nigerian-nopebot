@@ -54,10 +54,10 @@ async function ListCallback(err, res)
                     const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
                     
                     await DC_SendNormalMessage(`Email received! This email will be processed in ${delay / 1000 / 60} minutes!`);
+                    const id = latestMessage.threadId;
 
                     setTimeout(async () => {
-
-                        threadQueue.AddThread(latestMessage.threadId);
+                        threadQueue.AddThread(id);
 
                         if(!threadQueue.IsActive())
                             await threadQueue.ProcessEntireQueue();
