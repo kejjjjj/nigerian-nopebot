@@ -53,7 +53,7 @@ async function ListCallback(err, res)
                     const maxDelay = 120 * 60 * 1000; // 120 minutes
                     const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
                     
-                    await DC_SendNormalMessage(`Email received! This email will be processed in ${delay / 1000 / 60} minutes!`);
+                    await DC_SendNormalMessage(`Email received! This email will be processed in ${(delay / 1000 / 60).toFixed(1)} minutes!`);
                     const id = latestMessage.threadId;
 
                     setTimeout(async () => {

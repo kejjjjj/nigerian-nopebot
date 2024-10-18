@@ -10,7 +10,7 @@ export async function DC_BlockString(message, args)
         return SendFailureMessage(message, "Syntax Error", "Expected <string to block>");
 
     if(await Blacklist.IsBlockedString(args[0]))
-        return SendFailureMessage(message, "Failure", "This string is already blocked");
+        return SendFailureMessage(message, "Failure", "This string is already blacklisted");
 
     await Blacklist.BlockString(args[0]);
     return SendSuccessMessage(message, "Blocked!", args[0]);
@@ -18,10 +18,10 @@ export async function DC_BlockString(message, args)
 export async function DC_UnblockString(message, args)
 {
     if(args?.length !== 1)
-        return SendFailureMessage(message, "Syntax Error", "Expected <string to block>");
+        return SendFailureMessage(message, "Syntax Error", "Expected <string to whitelist>");
 
     if(!await Blacklist.IsBlockedString(args[0]))
-        return SendFailureMessage(message, "Failure", "This string is not blocked");
+        return SendFailureMessage(message, "Failure", "This string is not blacklisted");
 
     await Blacklist.UnblockString(args[0]);
     return SendSuccessMessage(message, "Removed!", args[0]);
@@ -39,6 +39,6 @@ export async function DC_GetBlocked(message, args)
     if(str.length < 1)
         return SendFailureMessage(message, "Internal Error", "str.length < 1");
 
-    return SendSuccessMessage(message, "All blocked strings", str);
+    return SendSuccessMessage(message, "All blacklisted strings", str);
 }
 

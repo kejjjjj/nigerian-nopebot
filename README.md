@@ -38,6 +38,7 @@ DISCORD_BOT_TOKEN= self explanatory\
 CHANNEL_NAME= # channel name\
 GUILD_IDS = # comma separated list of guild ids where this bot will be used\
 OPENAI_API_KEY= # self explanatory\
+OPENAI_MODEL="gpt-4o-mini"\
 DISCORD_ADMINS= # comma separated list of users who can use the bot's admin commands\
 WEBHOOK_SELF= # this client's name for the webhook\
 WEBHOOK_TARGET= # target's name for the webhook

@@ -173,7 +173,7 @@ export async function GenerateReplyToScam(context)
 
     const openAI = GetOpenAI();
     const completion = await openAI.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: process.env.OPENAI_MODEL,
         messages: msgs,
     });
 

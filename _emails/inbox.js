@@ -6,6 +6,7 @@ import { GetThreadFromDB } from './threads.js';
 import { HandleLatestMessageInThread } from './received.js';
 
 import { Thread } from '../_db/thread.js';
+import { Guild } from '../_db/discord.js';
 
 import { IsScamEmail } from '../_openai/received.js';
 
@@ -92,8 +93,9 @@ export async function GoThroughLastNumThreadsInInbox(count)
 
     const threads = res.data.threads || [];
 
+    const guildCount = await Guild.count();
 
-    await DC_SendNormalMessage(`Going through the last ${threads.length} threads!\nEstimated time: ${threads.length * 5 / 60} minutes`);
+    await DC_SendNormalMessage(`Going through the last ${threads.length} threads!\nEstimated time: ${(threads.length * 5 / 60 * guildCount).toFixed(1)} minutes`);
 
     threads.forEach(thread => threadQueue.AddThread(thread.id));
 
