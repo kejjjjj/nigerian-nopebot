@@ -5,6 +5,8 @@ import dotenv from 'dotenv'; dotenv.config();
 import { GetDiscordClient } from '../main.js';
 import { DC_Personality, DC_Dig } from './response.js';
 
+import { DC_BlockString, DC_UnblockString, DC_GetBlocked } from './blacklist.js';
+
 import { sequelize } from '../../_db/associations.js';
 import { DeleteEverything } from '../../_db/main.js';
 
@@ -18,6 +20,10 @@ const commands = [
     { name: "reset",        callback: DC_Reset,        adminOnly: true },
     { name: "personality",  callback: DC_Personality,  adminOnly: true },
     { name: "dig",          callback: DC_Dig,          adminOnly: true },
+
+    { name: "blacklist",    callback: DC_BlockString,  adminOnly: true },
+    { name: "whitelist",    callback: DC_UnblockString,adminOnly: true },
+    { name: "blacklisted",  callback: DC_GetBlocked,   adminOnly: true },
 ];
 
 

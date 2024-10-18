@@ -9,6 +9,7 @@ import { GetThreadData } from './inbox.js';
 import { CreateNewThread } from './threads.js';
 
 import { Channel } from '../_db/discord.js';
+import { Blacklist } from '../_db/blacklist.js';
 
 import { DC_SendNormalMessage } from '../_discord/commands/main.js';
 
@@ -32,6 +33,10 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
 
     if(!rawMessage || !rawMessage.data || !rawMessage.data.payload)
         throw "HandleLatestMessageInThread(): !rawMessage || !rawMessage.data || !rawMessage.data.payload";
+
+    if(await Blacklist.IncludesBlockedString(email.from)){
+        return await DC_SendNormalMessage(`Ignoring blacklisted sender: ${email.from}`);
+    }
 
     //error message!
     if(email.content.length < 1 

@@ -125,7 +125,7 @@ export class Guild extends Model
         }
         
         if(dbChannel)
-            await Channel.destroy({where: {id: dbChannel.id}});
+            await Channel.destroy({where: {id: dbChannel.id}, truncate: true});
 
         return await Channel.create({
             guildId: this.id,

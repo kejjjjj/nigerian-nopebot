@@ -44,7 +44,6 @@ export async function ConvertMessageClean(message) {
         if(!subject?.length && !body?.length)
             return reject("!subject?.length && !body?.length");
 
-
         const newbody = CleanEmailBody(body.trim());
         body = newbody.length > 0 ? newbody : body;
 
@@ -66,7 +65,8 @@ export async function ConvertMessageClean(message) {
 }
 
 export function CleanEmailBody(body) {
-    return body.split(/On .* wrote:/)[0].trim();
+    const data = body.split(/On .* wrote:/)[0].trim();
+    return data.length > 0 ? data : body;
 }
 export function FormatEmail(to, subject, message) {
 
