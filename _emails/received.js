@@ -91,7 +91,7 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
 
         //notify the servers :)
         const url = await dcThread.GetLatestMessageDiscordURL();
-        const msg = `Replied to ${url}!`;
+        const msg = `Replied to ${url} !`;
 
         const channel = await Channel.findByPk(dcThread.channelId);
 
