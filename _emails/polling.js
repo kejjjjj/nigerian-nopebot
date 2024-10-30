@@ -18,7 +18,8 @@ async function ListCallback(err, res)
         if (err) 
             throw err;
 
-
+        if(!res.data.messages || res.data.messages.length < 1)
+            throw "!res.data.messages || res.data.messages.length < 1";
 
         const latestMessage = res.data.messages[0];
         if (latestMessage.id !== lastMessageId) {
@@ -75,7 +76,6 @@ async function ListCallback(err, res)
         }
     }catch(ex){
         console.error("ListCallback(): ", ex);
-
     }
 
 }

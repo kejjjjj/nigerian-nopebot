@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'; dotenv.config();
 
 import { GetGmail } from './init.js';
-import { ConvertMessageClean, Delay } from './utils.js';
+import { ConvertMessageClean, Delay, HasMoreThanAWeekPassedSinceMessage } from './utils.js';
 import { GetThreadFromDB } from './threads.js';
 import { HandleLatestMessageInThread } from './received.js';
 
@@ -63,7 +63,7 @@ export async function GetThreadData(threadObj)
         
         async NeedsResponse() {
             
-            if(this.latestMessageWasByMe)
+            if(!HasMoreThanAWeekPassedSinceMessage(messages[messages.length - 1]) && this.latestMessageWasByMe)
                 return false;
 
             if(this.ThreadExists())

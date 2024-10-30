@@ -68,6 +68,7 @@ export function CleanEmailBody(body) {
     const data = body.split(/On .* wrote:/)[0].trim();
     return data.length > 0 ? data : body;
 }
+
 export function FormatEmail(to, subject, message) {
 
     const emailLines = [
@@ -101,4 +102,23 @@ export function FormatEmailReply(message, content) {
     const base64Email = Buffer.from(email).toString('base64');
 
     return base64Email;
+}
+
+export function GetMessageTimestamp(message)
+{
+    return message?.internalDate || 0;
+}
+export function HasMoreThanAWeekPassedSinceMessage(message) {
+
+    const latestTimestamp = GetMessageTimestamp(message);
+
+    console.log(latestTimestamp);
+
+    if(!latestTimestamp)
+        return false;
+
+    const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; 
+    const currentTime = Date.now(); 
+    
+    return (currentTime -  latestTimestamp) > oneWeekInMillis;
 }

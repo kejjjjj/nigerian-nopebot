@@ -5,7 +5,7 @@ import axios from 'axios';
 
 
 import { PollEmails } from './polling.js'; 
-
+import { GoThroughLastNumThreadsInInbox } from './inbox.js';
 const oAuth2Client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
     process.env.CLIENT_SECRET,
@@ -84,6 +84,11 @@ export async function EmailInit()
 
         gmail = google.gmail({ version: 'v1', auth });
         await PollEmails( auth );
+
+        //go through the entire inbox once every 24h
+        setInterval(async () => { await GoThroughLastNumThreadsInInbox(500); }, 24 * 60 * 60 * 1000);
+
+        //poll new emails every minute
         setInterval(async () => { await PollEmails( auth ); }, 60000);
 
     }catch(ex){
