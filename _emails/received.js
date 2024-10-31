@@ -72,7 +72,7 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
 
     //send the target's message to discord
     //but don't send a duplicate if this thread was created now
-    if(data.ThreadExists()){
+    if(data.ThreadExists() && !data.latestMessageWasByMe){
         for(const dcThread of discordThreads)
             await dcThread.SendMessageInThread(messages[messages.length-1].content, await dcThread.GetWebhookByName(process.env.WEBHOOK_TARGET));
     }

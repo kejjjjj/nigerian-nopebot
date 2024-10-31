@@ -112,8 +112,6 @@ export function HasMoreThanAWeekPassedSinceMessage(message) {
 
     const latestTimestamp = GetMessageTimestamp(message);
 
-    console.log(latestTimestamp);
-
     if(!latestTimestamp)
         return false;
 
