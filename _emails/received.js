@@ -63,12 +63,15 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
         throw "HandleLatestMessageInThread(): !messages";
     }
 
-    if(messages.length > 100){
+    if(messages.length > 200){
         console.error("too many messages in thread: ", threadId);
         return;
     }
 
     const discordThreads = await thread.GetAllDiscordThreads();
+
+    if(messages[messages.length-1].content.length < 1)
+        return;
 
     //send the target's message to discord
     //but don't send a duplicate if this thread was created now
