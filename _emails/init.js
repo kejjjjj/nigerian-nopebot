@@ -79,6 +79,7 @@ export async function GetAccessToken()
 export async function EmailInit()
 {
     
+    let intervals = [];
     try{
         const auth = GetAuth();
 
@@ -86,14 +87,16 @@ export async function EmailInit()
         await PollEmails( auth );
 
         //go through the entire inbox once every 24h
-        setInterval(async () => { await GoThroughLastNumThreadsInInbox(500); }, 24 * 60 * 60 * 1000);
+        intervals.push(setInterval(async () => { await GoThroughLastNumThreadsInInbox(500); }, 24 * 60 * 60 * 1000));
 
         //poll new emails every minute
-        setInterval(async () => { await PollEmails( auth ); }, 60000);
+        intervals.push(setInterval(async () => { await PollEmails( auth ); }, 60000));
 
     }catch(ex){
+
         console.log("ERROR: ", ex);
-
+        
+        for(const interval of intervals)
+            clearInterval(interval);
     }
-
 }

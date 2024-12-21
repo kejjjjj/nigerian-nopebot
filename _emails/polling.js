@@ -82,17 +82,17 @@ async function ListCallback(err, res)
 
 export async function PollEmails(auth)
 {
-    try{
-        await GetAccessToken();
+    //try{
+    await GetAccessToken();
 
-        GetGmail().users.messages.list({
-            userId: 'me',
-            labelIds: ['INBOX'],
-            maxResults: 1,  // Fetch the latest message
-        }, ListCallback);
+    GetGmail().users.messages.list({
+        userId: 'me',
+        labelIds: ['INBOX'],
+        maxResults: 1,  // Fetch the latest message
+    }, ListCallback);
 
-    }catch(ex){
-        console.error("PollEmails(): ", ex);
-    }
+    // }catch(ex){
+    //     console.error("PollEmails(): ", ex);
+    // }
 
 }

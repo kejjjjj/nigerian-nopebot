@@ -35,7 +35,8 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
         throw "HandleLatestMessageInThread(): !rawMessage || !rawMessage.data || !rawMessage.data.payload";
 
     if(await Blacklist.IncludesBlockedString(email.from)){
-        return await DC_SendNormalMessage(`Ignoring blacklisted sender: ${email.from}`);
+        return;
+        //return await DC_SendNormalMessage(`Ignoring blacklisted sender: ${email.from}`);
     }
 
     //error message!
@@ -63,7 +64,7 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
         throw "HandleLatestMessageInThread(): !messages";
     }
 
-    if(messages.length > 200){
+    if(messages.length > 400){
         console.error("too many messages in thread: ", threadId);
         return;
     }
@@ -101,9 +102,9 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
         if(channel){
             await DC_SendNormalMessage(msg, channel.channelId);
         }
-        else
+        else{
             console.error("HandleLatestMessageInThread(): !(await Channel.findByPk(dcThread.channelId))");
-    
+        }
 
     }
 }
