@@ -12,11 +12,14 @@ import { DeleteEverything } from '../../_db/main.js';
 
 import { GetTargetChannelIds } from '../../_db/discord.js'; 
 
+import { Delay } from '../../_emails/utils.js';
+
 const admins = process.env.DISCORD_ADMINS.split(',');
 
 export function isAdmin(userid) { return admins.findIndex(admin => admin === userid) !== -1; }
 
 const commands = [
+    { name: "panic",        callback: DC_Panic,        adminOnly: true },
     { name: "reset",        callback: DC_Reset,        adminOnly: true },
     { name: "personality",  callback: DC_Personality,  adminOnly: true },
     { name: "dig",          callback: DC_Dig,          adminOnly: true },
@@ -90,6 +93,15 @@ export async function DC_OnMessageCreate(client, message)
     }
 
 } 
+
+ 
+async function DC_Panic(message, args)
+{
+
+    SendSuccessMessage(message, "Success!", "The process will exit in 5 seconds!");
+    await Delay(5000);
+    process.exit(1);
+}
 
 export async function DC_Reset(message, args)
 {

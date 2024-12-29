@@ -30,7 +30,5 @@ export async function CreateNewThread(threadId, email)
         await channel.CreateNewThread(thread, thread.from);
     }
 
-
-
     return thread;
 }

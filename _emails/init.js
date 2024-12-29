@@ -63,7 +63,7 @@ async function GetAccessTokenInternal() {
         });
         return response.data.access_token;
     } catch (error) {
-        console.error('Error fetching access token:', error.response.data);
+        console.error('Error fetching access token:', error?.response?.data);
         throw error;
     }
 }
