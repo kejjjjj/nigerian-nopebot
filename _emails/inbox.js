@@ -52,6 +52,7 @@ export async function GetThreadData(threadObj)
         return undefined;
 
     const latestMessageWasByMe = latestMessageBody.from.includes(process.env.EMAIL_ADDRESS);
+    const moreThanWeekPassed = HasMoreThanAWeekPassedSinceMessage(messages[messages.length - 1]);
 
     return {
         thread,
@@ -59,11 +60,11 @@ export async function GetThreadData(threadObj)
         latestMessageBody,
         initialMessage,
         moreThanWeekPassed,
+
         ThreadExists() { return !!this.thread; },
         
         async NeedsResponse() {
             
-            this.moreThanWeekPassed = HasMoreThanAWeekPassedSinceMessage(messages[messages.length - 1]);
             if(!this.moreThanWeekPassed && this.latestMessageWasByMe)
                 return false;
 
