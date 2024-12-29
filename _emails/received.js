@@ -81,7 +81,7 @@ export async function HandleLatestMessageInThread(gmailThread, rawMessage, email
             await dcThread.SendMessageInThread(messages[messages.length-1].content, await dcThread.GetWebhookByName(process.env.WEBHOOK_TARGET));
     }
 
-    const result = await GenerateReplyToScam(messages);
+    const result = await GenerateReplyToScam(messages, data.moreThanWeekPassed);
     if(!result)
         throw "HandleLatestMessageInThread(): !result";
 

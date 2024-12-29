@@ -58,12 +58,13 @@ export async function GetThreadData(threadObj)
         latestMessageWasByMe,
         latestMessageBody,
         initialMessage,
-
+        moreThanWeekPassed,
         ThreadExists() { return !!this.thread; },
         
         async NeedsResponse() {
             
-            if(!HasMoreThanAWeekPassedSinceMessage(messages[messages.length - 1]) && this.latestMessageWasByMe)
+            this.moreThanWeekPassed = HasMoreThanAWeekPassedSinceMessage(messages[messages.length - 1]);
+            if(!this.moreThanWeekPassed && this.latestMessageWasByMe)
                 return false;
 
             if(this.ThreadExists())
