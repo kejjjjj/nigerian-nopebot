@@ -273,7 +273,7 @@ export class Discord extends Model
 
         await Discord.create({
                 personality: "a somewhat clueless person who speaks poor english - showing a lot of interest towards whatever they are offering",
-                lateNotice: "It has been over a week since the last response you got. Be very upset and frustrated about them not responding."
+                lateNotice: "Be very upset and frustrated about them not responding."
             });
         
         console.log("Discord DB initialized");
@@ -518,7 +518,7 @@ Discord.init(
         },
         lateNotice: {
             type: DataTypes.STRING,
-            defaultValue: "It has been over a week since the last response you got. Be very upset and frustrated about them not responding.",
+            defaultValue: "Be very upset and frustrated about them not responding.",
             allowNull: false,
         }
     },
