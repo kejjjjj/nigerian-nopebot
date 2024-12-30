@@ -262,68 +262,18 @@ export class Channel extends Model
     }
 }
 
-// export class Discord extends Model
-// {
-//     static async Init()
-//     {
-
-//         const oldSize = await Discord.count();
-//         for(const id of GUILD_IDS){
-
-//             const guild = await Guild.findOne({where: {guildId: id}});
-
-//             if(!guild)
-//                 throw "Discord::Init(): !guild";
-
-//             const discord = await Discord.findOne({where: {guildId: guild.id}});
-
-//             if(!discord){
-//                 await Discord.create({
-//                     guildId: guild.id,
-//                     personality: "a somewhat clueless person who speaks poor english - showing a lot of interest towards whatever they are offering"
-//                 });
-//                 console.log(`added a new guild: ${id}`);
-//             }
-//         }
-        
-//         if(oldSize !== await Discord.count());
-//             console.log("Discord DB updated!");
-        
-//     }
-
-//     static async Get(guild)
-//     {
-//         if(!(guild instanceof Guild))
-//             throw "Discord::Get(): !(guild instance of Guild)";
-
-//         return await Discord.findOne({where: { guildId: guild.id }});
-//     }
-    
-//     async SetPersonality(personality)
-//     {
-//         if(typeof(personality) !== "string")
-//             throw "Discord::SetPersonality(): typeof(personality) !== 'string'";
-
-//         this.personality = personality;
-//         await this.save();
-//     }
-
-//     async GetPersonality()
-//     {
-//         return this.personality;
-//     }
-
-// }
-
 export class Discord extends Model
 {
     static async Init()
     {
-        if(await Discord.count() >= 1)
+        if(await Discord.count() >= 1){
+            //Discord.sync({ alter: true });
             return;
+        }
 
         await Discord.create({
-                personality: "a somewhat clueless person who speaks poor english - showing a lot of interest towards whatever they are offering"
+                personality: "a somewhat clueless person who speaks poor english - showing a lot of interest towards whatever they are offering",
+                lateNotice: "It has been over a week since the last response you got. Be very upset and frustrated about them not responding."
             });
         
         console.log("Discord DB initialized");
@@ -360,6 +310,30 @@ export class Discord extends Model
             throw "SetPersonality(): !instance";
 
         return instance.personality;
+    }
+
+    static async SetLateNotice(text)
+    {
+        const instance = await Discord.Get();
+
+        if(!instance)
+            throw "SetLateNotice(): !instance";
+
+        if(typeof(text) !== "string")
+            throw "SetLateNotice(): typeof(text) !== 'string'";
+
+        instance.lateNotice = text;
+        await instance.save();
+    }
+
+    static async GetLateNotice()
+    {
+        const instance = await Discord.Get();
+
+        if(!instance)
+            throw "SetPersonality(): !instance";
+
+        return instance.lateNotice;
     }
 
 }
@@ -539,16 +513,14 @@ Discord.init(
         },
         personality: {
             type: DataTypes.STRING,
+            defaultValue: "You don't have a personality yet",
             allowNull: false,
         },
-        // guildId: {
-        //     type: DataTypes.INTEGER,
-        //     allowNull: false,
-        //     references: {
-        //         model: Guild, 
-        //         key: 'id' 
-        //     }
-        // }
+        lateNotice: {
+            type: DataTypes.STRING,
+            defaultValue: "It has been over a week since the last response you got. Be very upset and frustrated about them not responding.",
+            allowNull: false,
+        }
     },
     {
         sequelize

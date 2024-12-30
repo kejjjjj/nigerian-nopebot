@@ -80,21 +80,19 @@ function GetAllScammerMessages(messages)
     return msgs;
 }
 
-function GenerateQueriesFromContextAndPersonality(context, personality, moreThanWeekPassed)
+function GenerateQueriesFromContextAndPersonality(context, personality, moreThanWeekPassed, lateNotice)
 {
 
 
     if(!context || (context?.length ?? 0) < 1)
         throw "!context || (context?.length ?? 0) < 1";
 
-    // console.log("context.length: ", context.length);
-
     const systemText = 
     `Your name is ${process.env.WHO_AM_I}.
     This is your personality: '${personality}'.
     You will never get sidetracked by unrelated questions - you will always try to force the recipient to stay in the topic (the first message),
     but you will still prioritize the most recent message.
-    ${moreThanWeekPassed ? "It has been over a week since the last response you got. Be very upset and frustrated about them not responding." : ""}`;
+    ${lateNotice}`;
 
     const systemInput = { role: "system",  content: systemText };
     const userInputs = GenerateQueriesFromContext(context);
@@ -131,10 +129,14 @@ export async function GenerateReplyToScam(context, moreThanWeekPassed)
     if(!personality)
         throw "GenerateReplyToScam(): !personality";
 
-    const msgs = GenerateQueriesFromContextAndPersonality(context, personality, moreThanWeekPassed);
 
-    // console.log("context: ");
-    // msgs.forEach(msg => console.log(msg));
+    const lateNotice = await Discord.GetLateNotice();
+
+    if(!lateNotice)
+        throw "GenerateQueriesFromContextAndPersonality(): !lateNotice";
+
+    const lateNoticeText = `${moreThanWeekPassed ? `It has been over a week since the last response you got. ${lateNotice}` : ""}`;
+    const msgs = GenerateQueriesFromContextAndPersonality(context, personality, lateNoticeText);
 
     const openAI = GetOpenAI();
     const completion = await openAI.chat.completions.create({

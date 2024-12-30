@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 import dotenv from 'dotenv'; dotenv.config();
 
 import { GetDiscordClient } from '../main.js';
-import { DC_Personality, DC_Dig } from './response.js';
+import { DC_Personality, DC_LateNotice, DC_Dig } from './response.js';
 
 import { DC_BlockString, DC_UnblockString, DC_GetBlocked } from './blacklist.js';
 
@@ -22,6 +22,8 @@ const commands = [
     { name: "panic",        callback: DC_Panic,        adminOnly: true },
     { name: "reset",        callback: DC_Reset,        adminOnly: true },
     { name: "personality",  callback: DC_Personality,  adminOnly: true },
+    { name: "lateNotice",   callback: DC_LateNotice,   adminOnly: true },
+
     { name: "dig",          callback: DC_Dig,          adminOnly: true },
 
     { name: "blacklist",    callback: DC_BlockString,  adminOnly: true },

@@ -27,6 +27,26 @@ export async function DC_Personality(message, args)
     await Discord.SetPersonality(args[0]);
     return SendSuccessMessage(message, "Personality set!", args[0]);
 }
+export async function DC_LateNotice(message, args)
+{
+
+    if((args?.length ?? 0) > 1)
+        return SendFailureMessage(message, "Syntax Error", "Expected <new notice (optional)>");
+
+    const count = args.length;
+
+    if(count === 0){
+        const instance = await Discord.GetLateNotice();
+
+        if(!instance)
+            return SendFailureMessage(message, "Internal error", "Expression: !instance");
+
+        return SendMessage(message, instance);
+    }
+
+    await Discord.SetLateNotice(args[0]);
+    return SendSuccessMessage(message, "Late notice set!", args[0]);
+}
 
 export async function DC_Dig(message, args)
 {
