@@ -80,7 +80,7 @@ function GetAllScammerMessages(messages)
     return msgs;
 }
 
-function GenerateQueriesFromContextAndPersonality(context, personality, moreThanWeekPassed, lateNotice)
+function GenerateQueriesFromContextAndPersonality(context, personality, lateNotice)
 {
 
 
