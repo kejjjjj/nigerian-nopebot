@@ -141,7 +141,7 @@ export class Guild extends Model
         for(const channel of channels)
             await channel.Destructor();
 
-        const webhooks = await GetWebhooks();
+        const webhooks = await this.GetWebhooks();
 
         webhooks.forEach(async (webhook) => {
             try {

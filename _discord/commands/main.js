@@ -115,12 +115,14 @@ export async function DC_Reset(message, args)
 
     switch(query){
         case "everything":
+            return SendSuccessMessage(message, "Success!", "The entire database will be wiped (including discord threads)!");
             await DeleteEverything();
-            return SendSuccessMessage(message, "Success!", "The entire database has been wiped (including discord threads)!");
         default:
             return SendFailureMessage(message, "Syntax Error", "Unrecognized query!");
             break;
-    }    
+    }   
+
+
 
 }
 

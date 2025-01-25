@@ -15,4 +15,7 @@ export async function DeleteEverything()
     await sequelize.sync({force: true});
 
     console.log("everything has been erased");
+
+    process.exit(1);
+
 }
